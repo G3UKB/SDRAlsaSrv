@@ -44,6 +44,8 @@ typedef struct ThreadData {
 	ringb_t *rb;
 }ThreadData;
 
+ThreadData *td;
+
 int main() {
 
     // Local variables
