@@ -31,7 +31,13 @@ The authors can be reached by email at:
 #include <sys/ioctl.h>
 #include <linux/usbdevice_fs.h>
 #include <pthread.h>
+/* Use the newer ALSA API */
+#define ALSA_PCM_NEW_HW_PARAMS_API
+#include <alsa/asoundlib.h>
 
 // Application includes
 #include "../ringbuffer/ringb.h"
 #include "../alsa/alsa.h"
+#include "../udpreader/udp_reader.h"
+#include "../udpwriter/udp_writer.h"
+#include "../main/main.h"

@@ -32,40 +32,71 @@ The authors can be reached by email at:
 // Allow 10 reads of 1024 IQ samples
 #define iq_ring_byte_sz 10*1024*4
 
-// Program variables
-// Ring buffer to hold audio samples
-ringb_t *rb_iq;
-// Threads for audio capture and UDP dispatch
-pthread_t alsa_thd;
-pthread_t udp_thd;
-
-// Passed to the threads
-typedef struct ThreadData {
-	ringb_t *rb;
-}ThreadData;
-
-ThreadData *td;
-
+// Program entry point
 int main() {
 
     // Local variables
-    int rc;
+    int rc, iq_ring_sz;
 
     printf("SDR ALSA Server starting...\n");
 
+    //===========================================================================
     // Allocate a ring buffer to hold audio samples
-    rb_iq = ringb_create (iq_ring_byte_sz);
+    iq_ring_sz = pow(2, ceil(log(iq_ring_byte_sz)/log(2)));
+    rb_iq = ringb_create (iq_ring_sz);
 
+    //===========================================================================
+    // ALSA init
     // Allocate thread data structure
-	td = (ThreadData *)safealloc(sizeof(ThreadData), sizeof(char), "TD_STRUCT");
+	alsa_td = (alsa_thread_data*)safealloc(sizeof(alsa_thread_data), sizeof(char), "ALSA_TD_STRUCT");
 	// Init with thread data items
-    td->rb = rb_iq;
+	alsa_td->terminate = FALSE;
+    alsa_td->rb = rb_iq;
 
 	// Create the ALSA thread
-	rc = pthread_create(&alsa_thd, NULL, alsa_imp, (void *)td);
+	rc = pthread_create(&alsa_thd, NULL, alsa_imp, (void *)alsa_td);
 	if (rc){
         printf("Failed to create ALSA thread [%d]\n", rc);
         exit(1);;
 	}
 
+	//===========================================================================
+    // UDP writer init
+    // Allocate thread data structure
+	udp_writer_td = (udp_thread_data*)safealloc(sizeof(udp_thread_data), sizeof(char), "UDP_TD_STRUCT");
+	// Init with thread data items
+	udp_writer_td->terminate = FALSE;
+    udp_writer_td->rb = rb_iq;
+    udp_writer_td->sock = 0;
+
+	// Create the UDP writer thread
+	rc = pthread_create(&udp_writer_thd, NULL, udp_writer_imp, (void *)udp_writer_td);
+	if (rc){
+        printf("Failed to create UDP writer thread [%d]\n", rc);
+        exit(1);;
+	}
+
+	//===========================================================================
+    // UDP writer init
+    // Allocate thread data structure
+	udp_reader_td = (udp_thread_data*)safealloc(sizeof(udp_thread_data), sizeof(char), "UDP_TD_STRUCT");
+	// Init with thread data items
+	udp_reader_td->terminate = FALSE;
+    udp_reader_td->rb = rb_iq;
+    udp_reader_td->sock = 0;
+
+	// Create the UDP writer thread
+	rc = pthread_create(&udp_reader_thd, NULL, udp_reader_imp, (void *)udp_reader_td);
+	if (rc){
+        printf("Failed to create UDP reader thread [%d]\n", rc);
+        exit(1);;
+	}
+
+	sleep(15);
+	alsa_td->terminate = TRUE;
+	udp_writer_td->terminate = TRUE;
+	udp_reader_td->terminate = TRUE;
+    sleep(1);
+
+	exit(0);
 }
