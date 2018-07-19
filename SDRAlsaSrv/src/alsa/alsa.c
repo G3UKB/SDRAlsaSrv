@@ -215,11 +215,11 @@ static void alsa_read_frame()
         } else {
             // Valid frame of correct size
             // Add to the ring buffer
-            // Remember one fram is I 16bits, Q 16 bits so 4 bytes
+            // Remember one frame is I 16bits, Q 16 bits so 4 bytes
             if (ringb_write_space (rb) > frames*4) {
 				ringb_write (rb, (char *)buffer, frames*4);
 			} else {
-                //printf("Ring buffer is full, skipping samples...\n");
+                printf("Ring buffer is full, skipping samples...\n");
 			}
         }
     }

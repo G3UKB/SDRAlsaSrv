@@ -78,7 +78,9 @@ void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
             freq = (int)(freq | b0);
             if (freq != last_freq) {
                 last_freq = freq;
+                // printf("%d\n",freq);
                 // Use the FCD controller software to set the frequency
+
                 stat = fcdAppSetFreq(freq);
                 if (stat == FCD_MODE_NONE)
                 {
