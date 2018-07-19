@@ -41,6 +41,9 @@ int main() {
     printf("SDR ALSA Server starting...\n");
 
     //===========================================================================
+    // Do discovery protocol 1 as per HPSDR
+
+    //===========================================================================
     // Allocate a ring buffer to hold audio samples
     iq_ring_sz = pow(2, ceil(log(iq_ring_byte_sz)/log(2)));
     rb_iq = ringb_create (iq_ring_sz);
@@ -77,7 +80,7 @@ int main() {
 	}
 
 	//===========================================================================
-    // UDP writer init
+    // UDP reader init
     // Allocate thread data structure
 	udp_reader_td = (udp_thread_data*)safealloc(sizeof(udp_thread_data), sizeof(char), "UDP_TD_STRUCT");
 	// Init with thread data items
