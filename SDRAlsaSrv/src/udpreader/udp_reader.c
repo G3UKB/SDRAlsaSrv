@@ -32,6 +32,7 @@ The authors can be reached by email at:
 
 // Module vars
 unsigned char pcdata[METIS_FRAME_SZ];
+int last_freq = -1;
 
 // Thread entry point for ALSA processing
 void udp_reader_imp(void* data){
@@ -43,7 +44,8 @@ void udp_reader_imp(void* data){
     printf("Started UDP reader thread\n");
 
     while (td->terminate == FALSE) {
-         udprecvdata(sd, cli_addr);
+         //udprecvdata(sd, cli_addr);
+         sleep(0.1);
     }
 
     printf("UDP Reader thread exiting...\n");
@@ -74,16 +76,18 @@ void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
             freq = (int)(freq | (b2 << 16));
             freq = (int)(freq | (b1 << 8));
             freq = (int)(freq | b0);
-
-            // Use the FCD controller software to set the frequency
-            stat = fcdAppSetFreq(freq);
-            if (stat == FCD_MODE_NONE)
-            {
-                printf("No FCD Detected!\n");
-            }
-            else if (stat == FCD_MODE_BL)
-            {
-                printf("FCD in bootloader mode!\n");
+            if (freq != last_freq) {
+                last_freq = freq;
+                // Use the FCD controller software to set the frequency
+                stat = fcdAppSetFreq(freq);
+                if (stat == FCD_MODE_NONE)
+                {
+                    printf("No FCD Detected!\n");
+                }
+                else if (stat == FCD_MODE_BL)
+                {
+                    printf("FCD in bootloader mode!\n");
+                }
             }
         }
     }

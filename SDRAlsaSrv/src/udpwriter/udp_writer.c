@@ -58,6 +58,8 @@ void udp_writer_imp(void* data){
                 printf("Send packet data failed!\n");
             }
         }
+        // Temp to debug
+        udprecvdata(sd, cli_addr);
     }
     printf("UDP Writer thread exiting...\n");
 }

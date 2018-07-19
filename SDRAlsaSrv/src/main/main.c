@@ -74,8 +74,14 @@ int main() {
     iq_ring_sz = pow(2, ceil(log(iq_ring_byte_sz)/log(2)));
     rb_iq = ringb_create (iq_ring_sz);
 
+    // Init FCD
+    if( fcdOpen() == (hid_device*)NULL ) {
+        printf("No FCD Detected!\n");
+        exit(1);
+    }
+
     //===========================================================================
-    // Format init
+    // Init formatting
     fmtinit();
 
     //===========================================================================
@@ -170,9 +176,9 @@ int revert_sd(int sd) {
     int broadcast = 0;
     int sendbuff = 32000;
     int recvbuff = 32000;
-    //struct timeval tv;
-    //tv.tv_sec = 0;
-    //tv.tv_usec = 10;
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 10;
 
     // Turn off broadcast
     if (setsockopt(sd, SOL_SOCKET, SO_BROADCAST, &broadcast,sizeof broadcast) == -1) {
@@ -190,10 +196,10 @@ int revert_sd(int sd) {
         return FALSE;
     }
     // Set receive timeout
-    //if (setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv) == -1) {
-    //     printf("Failed to set option SO_RCVTIMEO!\n");
-    //    return FALSE;
-    //}
+    if (setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv) == -1) {
+         printf("Failed to set option SO_RCVTIMEO!\n");
+        return FALSE;
+    }
     return TRUE;
 }
 
