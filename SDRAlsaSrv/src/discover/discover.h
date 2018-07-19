@@ -24,8 +24,16 @@ The authors can be reached by email at:
 	bob@bobcowdery.plus.com
 */
 
-// UDP socket
-int sock;
+/* Constants */
+#define LOCAL_SERVER_PORT 1024
+#define MAX_MSG 100
+#define MAX_RESP 60
+#define DISCOVERY_MSG 0
+#define START_MSG 1
+#define STOP_MSG 2
+#define UNKNOWN_MSG -1
+#define READ_FAILURE -2
+#define DISCOVERY_RESP 3
 
 // Prototypes
-int udpinit();
+struct sockaddr_in *do_discover();

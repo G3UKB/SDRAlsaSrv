@@ -48,6 +48,7 @@ The authors can be reached by email at:
 #include "../ringbuffer/ringb.h"
 #include "../alsa/alsa.h"
 #include "../formatter/formatter.h"
+#include "../discover/discover.h"
 #include "../udpreader/udp_reader.h"
 #include "../udpwriter/udp_writer.h"
 #include "../main/main.h"

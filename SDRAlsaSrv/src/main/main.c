@@ -37,11 +37,33 @@ int main() {
 
     // Local variables
     int rc, iq_ring_sz;
+    int broadcast = 0;
+    struct sockaddr_in *cli_addr;
 
     printf("SDR ALSA Server starting...\n");
 
     //===========================================================================
     // Do discovery protocol 1 as per HPSDR
+    cli_addr = do_discover();
+    if (cli_addr = NULL) {
+        printf("Sorry, discovery protocol failed!\n");
+        exit(1);
+    }
+
+    /*
+    broadcast = 0;
+    if (setsockopt(sd, SOL_SOCKET, SO_BROADCAST, &broadcast,sizeof broadcast) == -1) {
+        printf("setsockopt (SO_BROADCAST)\n");
+    }
+
+    if (setsockopt(sd, SOL_SOCKET, SO_SNDBUF, &sendbuff, sizeof(sendbuff)) == -1) {
+         printf("setsockopt (SO_SNDBUF)\n");
+    }
+
+    if (setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv) == -1) {
+         printf("setsockopt (SO_RCVTIMEO)\n");
+    }
+    */
 
     //===========================================================================
     // Allocate a ring buffer to hold audio samples
