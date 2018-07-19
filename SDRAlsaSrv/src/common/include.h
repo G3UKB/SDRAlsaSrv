@@ -37,6 +37,7 @@ The authors can be reached by email at:
 #include <fcntl.h>
 #include <errno.h>
 #include <math.h>
+#include <signal.h>
 #include <sys/ioctl.h>
 #include <linux/usbdevice_fs.h>
 #include <pthread.h>

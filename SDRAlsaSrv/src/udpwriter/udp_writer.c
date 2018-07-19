@@ -27,15 +27,37 @@ The authors can be reached by email at:
 // Includes
 #include "../common/include.h"
 
+short *smpl_buffer;
+unsigned char *packet_buffer;
+
 // Thread entry point for ALSA processing
 void udp_writer_imp(void* data){
     // Get our thread parameters
     udp_thread_data* td = (udp_thread_data*)data;
     ringb_t *rb = td->rb;
+    int sd = td->socket;
+    struct sockaddr_in *cli_addr = td->cli_addr;
+
     printf("Started UDP writer thread\n");
 
+    // Allocate buffer
+    smpl_buffer = (short*) malloc(READ_SZ);
+
+    // Loop until terminated
     while (td->terminate == FALSE) {
-         sleep(1);
+
+        // Check data availability
+        if (ringb_read_space (rb) > READ_SZ) {
+            // Read one frames worth
+            ringb_read (rb, (char*)smpl_buffer, READ_SZ);
+            // Format into a protocol 1 frame
+            packet_buffer = fmtframe((short *)smpl_buffer);
+            // Dispatch to client
+            if (sendto(sd, packet_buffer, METIS_FRAME_SZ, 0, (struct sockaddr*)cli_addr, sizeof(*cli_addr)) == -1)
+            {
+                printf("Send packet data failed!\n");
+            }
+        }
     }
 
     printf("UDP Writer thread exiting...\n");

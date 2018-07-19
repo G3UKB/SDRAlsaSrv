@@ -24,9 +24,6 @@ The authors can be reached by email at:
 	bob@bobcowdery.plus.com
 */
 
-// Constants
-#define METIS_FRAME_SZ 1032
-
 // Prototypes
 void fmtinit();
 void fmtclean();

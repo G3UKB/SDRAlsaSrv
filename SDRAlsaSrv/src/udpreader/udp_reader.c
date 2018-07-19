@@ -32,6 +32,9 @@ void udp_reader_imp(void* data){
     // Get our thread parameters
     udp_thread_data* td = (udp_thread_data*)data;
     ringb_t *rb = td->rb;
+    int sd = td->socket;
+    struct sockaddr_in *cli_addr = td->cli_addr;
+
     printf("Started UDP reader thread\n");
 
     while (td->terminate == FALSE) {

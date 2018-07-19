@@ -27,6 +27,13 @@ The authors can be reached by email at:
 #ifndef _udp_writer_h
 #define _udp_writer_h
 
+// Constants
+// One USB frame is 63 24 bit samples
+// Data is available as 16 bit samples
+// Therefor we need 2 frames of 16bit I and Q
+#define READ_SZ 63*2*4    // bytes
+
+// Prototypes
 void udp_writer_imp();
 
 #endif
