@@ -37,12 +37,15 @@ int open_bc_socket();
 int revert_sd(int sd);
 void INThandler(int sig);
 
+// Module vars
+struct sockaddr_in *cli_addr;
+int sd;
+
 // Program entry point
 int main() {
 
     // Local variables
-    int rc, sd, iq_ring_sz;
-    struct sockaddr_in *cli_addr;
+    int rc, iq_ring_sz;
 
     printf("SDR ALSA Server starting...\n");
 
@@ -121,7 +124,7 @@ int main() {
 	rc = pthread_create(&udp_reader_thd, NULL, udp_reader_imp, (void *)udp_reader_td);
 	if (rc){
         printf("Failed to create UDP reader thread [%d]\n", rc);
-        exit(1);;
+        exit(1);
 	}
 
     // Wait for the exit signal
@@ -167,6 +170,9 @@ int revert_sd(int sd) {
     int broadcast = 0;
     int sendbuff = 32000;
     int recvbuff = 32000;
+    //struct timeval tv;
+    //tv.tv_sec = 0;
+    //tv.tv_usec = 10;
 
     // Turn off broadcast
     if (setsockopt(sd, SOL_SOCKET, SO_BROADCAST, &broadcast,sizeof broadcast) == -1) {
@@ -179,10 +185,15 @@ int revert_sd(int sd) {
         return FALSE;
     }
     // Set receive buffer size
-    if (setsockopt(sd, SOL_SOCKET, SO_RCVBUF, &sendbuff, sizeof(recvbuff)) == -1) {
+    if (setsockopt(sd, SOL_SOCKET, SO_RCVBUF, &recvbuff, sizeof(recvbuff)) == -1) {
          printf("Failed to set option SO_RCVBUF!\n");
         return FALSE;
     }
+    // Set receive timeout
+    //if (setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv) == -1) {
+    //     printf("Failed to set option SO_RCVTIMEO!\n");
+    //    return FALSE;
+    //}
     return TRUE;
 }
 

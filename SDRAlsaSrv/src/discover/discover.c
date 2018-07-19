@@ -63,12 +63,11 @@ struct sockaddr_in *do_discover(int sd) {
 // Receive one packet from the client
 static int udprecvcontrol(sd) {
     int n;
-    unsigned int cliLen;
+    unsigned int cliLen = sizeof(cliAddr);
 
     // Clear message buffer
     memset(msg,0x0,MAX_MSG);
     // receive message
-    cliLen = sizeof(cliAddr);
     n = recvfrom(sd, msg, MAX_MSG, 0, (struct sockaddr *) &cliAddr, &cliLen);
 
     if(n<0) {

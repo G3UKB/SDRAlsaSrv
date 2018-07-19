@@ -27,19 +27,64 @@ The authors can be reached by email at:
 // Includes
 #include "../common/include.h"
 
+// Forward refs
+//static void udprecvdata();
+
+// Module vars
+unsigned char pcdata[METIS_FRAME_SZ];
+
 // Thread entry point for ALSA processing
 void udp_reader_imp(void* data){
     // Get our thread parameters
     udp_thread_data* td = (udp_thread_data*)data;
-    ringb_t *rb = td->rb;
     int sd = td->socket;
     struct sockaddr_in *cli_addr = td->cli_addr;
 
     printf("Started UDP reader thread\n");
 
     while (td->terminate == FALSE) {
-         sleep(1);
+         udprecvdata(sd, cli_addr);
     }
 
     printf("UDP Reader thread exiting...\n");
+}
+
+
+// Read and discard data but extract the tuning frequency
+// Set the FCD to the frequency
+// ToDo - Enhance for other sound card type devices
+void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
+    unsigned char b0,b1,b2,b3;
+    unsigned int freq = 0;
+    int n, stat;
+    unsigned int addr_sz = sizeof(*cliAddr);
+
+    // Read a frame size data packet
+    n = recvfrom(sd, pcdata, METIS_FRAME_SZ, 0, (struct sockaddr_in *)cliAddr, &addr_sz);
+    if(n == METIS_FRAME_SZ) {
+        // Extract the control bytes
+        if ((pcdata[11] & 0xFE) == 0x02) {
+            // Extract freq LSB in bo
+            b3 = pcdata[12];
+            b2 = pcdata[13];
+            b1 = pcdata[14];
+            b0 = pcdata[15];
+            // Format into an unsigned int as a frequency in Hz
+            freq = (int)(b3 << 24);
+            freq = (int)(freq | (b2 << 16));
+            freq = (int)(freq | (b1 << 8));
+            freq = (int)(freq | b0);
+
+            // Use the FCD controller software to set the frequency
+            stat = fcdAppSetFreq(freq);
+            if (stat == FCD_MODE_NONE)
+            {
+                printf("No FCD Detected!\n");
+            }
+            else if (stat == FCD_MODE_BL)
+            {
+                printf("FCD in bootloader mode!\n");
+            }
+        }
+    }
 }

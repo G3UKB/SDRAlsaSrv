@@ -219,7 +219,7 @@ static void alsa_read_frame()
             if (ringb_write_space (rb) > frames*4) {
 				ringb_write (rb, (char *)buffer, frames*4);
 			} else {
-                printf("Ring buffer is full, skipping samples...\n");
+                //printf("Ring buffer is full, skipping samples...\n");
 			}
         }
     }

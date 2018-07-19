@@ -59,6 +59,5 @@ void udp_writer_imp(void* data){
             }
         }
     }
-
     printf("UDP Writer thread exiting...\n");
 }
