@@ -75,7 +75,7 @@ void fcdif_imp(void* data){
             else if (stat == FCD_MODE_BL)
                 printf("FCD in bootloader mode!\n");
         } else {
-            sleep(0.05);
+            sleep(0.1);
         }
     }
 
