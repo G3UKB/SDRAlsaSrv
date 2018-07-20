@@ -27,7 +27,7 @@ The authors can be reached by email at:
 #ifndef _udp_reader_h
 #define _udp_reader_h
 
+// Prototypes
 void udp_reader_imp();
-void udprecvdata(int sd, struct sockaddr_in *cliAddr);
 
 #endif

@@ -61,7 +61,7 @@ struct sockaddr_in *do_discover(int sd) {
 }
 
 // Receive one packet from the client
-static int udprecvcontrol(sd) {
+static int udprecvcontrol(int sd) {
     int n;
     unsigned int cliLen = sizeof(cliAddr);
 

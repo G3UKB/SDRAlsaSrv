@@ -50,6 +50,7 @@ The authors can be reached by email at:
 #include "../alsa/alsa.h"
 #include "../formatter/formatter.h"
 #include "../discover/discover.h"
+#include "../fcd/fcdif.h"
 #include "../fcd/fcd.h"
 #include "../fcd/fcdhidcmd.h"
 #include "../fcd/hidapi.h"

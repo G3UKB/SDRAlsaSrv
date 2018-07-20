@@ -28,11 +28,10 @@ The authors can be reached by email at:
 #include "../common/include.h"
 
 // Forward refs
-//static void udprecvdata();
+static void udprecvdata(int sd, struct sockaddr_in *cliAddr);
 
 // Module vars
 unsigned char pcdata[METIS_FRAME_SZ];
-int last_freq = -1;
 
 // Thread entry point for ALSA processing
 void udp_reader_imp(void* data){
@@ -44,8 +43,8 @@ void udp_reader_imp(void* data){
     printf("Started UDP reader thread\n");
 
     while (td->terminate == FALSE) {
-         //udprecvdata(sd, cli_addr);
-         sleep(0.1);
+         udprecvdata(sd, cli_addr);
+         sleep(0.05);
     }
 
     printf("UDP Reader thread exiting...\n");
@@ -55,10 +54,10 @@ void udp_reader_imp(void* data){
 // Read and discard data but extract the tuning frequency
 // Set the FCD to the frequency
 // ToDo - Enhance for other sound card type devices
-void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
+static void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
     unsigned char b0,b1,b2,b3;
     unsigned int freq = 0;
-    int n, stat;
+    int n;
     unsigned int addr_sz = sizeof(*cliAddr);
 
     // Read a frame size data packet
@@ -76,21 +75,8 @@ void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
             freq = (int)(freq | (b2 << 16));
             freq = (int)(freq | (b1 << 8));
             freq = (int)(freq | b0);
-            if (freq != last_freq) {
-                last_freq = freq;
-                // printf("%d\n",freq);
-                // Use the FCD controller software to set the frequency
-
-                stat = fcdAppSetFreq(freq);
-                if (stat == FCD_MODE_NONE)
-                {
-                    printf("No FCD Detected!\n");
-                }
-                else if (stat == FCD_MODE_BL)
-                {
-                    printf("FCD in bootloader mode!\n");
-                }
-            }
+            // printf("Freq %d\n", freq);
+            fcd_set_freq(freq);
         }
     }
 }

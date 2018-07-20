@@ -31,39 +31,43 @@ The authors can be reached by email at:
 #include "../common/include.h"
 
 // Forward refs
+static int fcd_get_freq();
 
 // Module vars
-pthread_mutex_t *fcd_mutex;
+pthread_mutex_t fcd_mutex = PTHREAD_MUTEX_INITIALIZER;
 int freq_hz;
 int last_freq = -1;
 
-void set_freq(f) {
-    pthread_mutex_lock(fcd_mutex);
+// Safe set frequency
+void fcd_set_freq(int f) {
+    pthread_mutex_lock(&fcd_mutex);
     freq_hz = f;
-    pthread_mutex_unlock(fcd_mutex);
+    pthread_mutex_unlock(&fcd_mutex);
 }
 
-static int get_freq() {
+// Safe get frequency
+static int fcd_get_freq() {
     int f;
-    pthread_mutex_lock(fcd_mutex);
+    pthread_mutex_lock(&fcd_mutex);
     f = freq_hz;
-    pthread_mutex_unlock(fcd_mutex);
+    pthread_mutex_unlock(&fcd_mutex);
+    return f;
 }
 
 // Thread entry point for FCD processing
 void fcdif_imp(void* data){
-    int new_freq;
-    pthread_mutex_t fcd_mutex = PTHREAD_MUTEX_INITIALIZER;
+    int stat, new_freq;
 
     // Get our thread parameters
     fcd_thread_data* td = (fcd_thread_data*)data;
 
     printf("Started FCD interface thread\n");
 
+    // Loop until terminated
     while (td->terminate == FALSE) {
-        new_freq = get_freq();
+        new_freq = fcd_get_freq();
         if (last_freq != new_freq) {
-            last_freq = freq;
+            last_freq = new_freq;
             // Use the FCD controller software to set the frequency
             stat = fcdAppSetFreq(new_freq);
             if (stat == FCD_MODE_NONE)

@@ -25,6 +25,16 @@ The authors can be reached by email at:
 	bob@bobcowdery.plus.com
 */
 
+/*
+ToDo :
+    1. Use conditions rather than sleeps in threads.
+    2. Maybe use select rather than straight write/read. Also look at the timeout value on reads.
+    3. Reduce CPU usage.
+    4. Try a Pi3 - is networking better?
+    5. Extend freq range of my app up to 2GHz.
+    6. Send back sufficient data to make it work with HPSDR programs.
+*/
+
 // Includes
 #include "../common/include.h"
 
@@ -74,6 +84,7 @@ int main() {
     iq_ring_sz = pow(2, ceil(log(iq_ring_byte_sz)/log(2)));
     rb_iq = ringb_create (iq_ring_sz);
 
+    //===========================================================================
     // Init FCD
     if( fcdOpen() == (hid_device*)NULL ) {
         printf("No FCD Detected!\n");
@@ -123,8 +134,8 @@ int main() {
 	// Init with thread data items
 	udp_reader_td->terminate = FALSE;
     udp_reader_td->rb = rb_iq;
-    udp_writer_td->socket = sd;
-    udp_writer_td->cli_addr = cli_addr;
+    udp_reader_td->socket = sd;
+    udp_reader_td->cli_addr = cli_addr;
 
 	// Create the UDP writer thread
 	rc = pthread_create(&udp_reader_thd, NULL, udp_reader_imp, (void *)udp_reader_td);
@@ -133,10 +144,25 @@ int main() {
         exit(1);
 	}
 
+	//===========================================================================
+    // FCD init
+    // Allocate thread data structure
+	fcd_td = (fcd_thread_data*)safealloc(sizeof(fcd_thread_data), sizeof(char), "FCD_TD_STRUCT");
+	// Init with thread data items
+	fcd_td->terminate = FALSE;
+
+	// Create the FCD interface thread
+	rc = pthread_create(&fcd_thd, NULL, fcdif_imp, (void *)fcd_td);
+	if (rc){
+        printf("Failed to create FCD thread [%d]\n", rc);
+        exit(1);
+	}
+
     // Wait for the exit signal
 	while(1) {
         pause();
 	}
+
 }
 
 // Open a broadcast socket
@@ -216,6 +242,7 @@ void  INThandler(int sig)
         alsa_td->terminate = TRUE;
         udp_writer_td->terminate = TRUE;
         udp_reader_td->terminate = TRUE;
+        fcd_td->terminate = TRUE;
         sleep(1);
         exit(0);
      }
