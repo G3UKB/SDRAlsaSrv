@@ -102,6 +102,10 @@ static int udpsendresp(int sd, int type) {
         resp[0] = 0xEF;
         resp[1] = 0xFE;
         resp[2] = 0x02;
+        // 6 bytes MAC address, ignored for now
+        // Frig Metis address to 1.8
+        resp[9] = 0x18;
+
         //Send discovery response packet
         if (sendto(sd, resp, MAX_RESP, 0, (struct sockaddr*) &cliAddr, sizeof(cliAddr)) == -1)
         {
