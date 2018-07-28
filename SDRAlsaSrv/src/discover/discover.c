@@ -103,6 +103,12 @@ static int udpsendresp(int sd, int type) {
         resp[1] = 0xFE;
         resp[2] = 0x02;
         // 6 bytes MAC address, ignored for now
+        resp[3] = 0x01;
+        resp[4] = 0x01;
+        resp[5] = 0x01;
+        resp[6] = 0x01;
+        resp[7] = 0x01;
+        resp[8] = 0x01;
         // Frig Metis address to 1.8
         resp[9] = 0x18;
 
