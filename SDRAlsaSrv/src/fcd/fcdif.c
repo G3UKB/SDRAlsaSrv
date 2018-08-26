@@ -66,6 +66,7 @@ void fcdif_imp(void* data){
     // Loop until terminated
     while (td->terminate == FALSE) {
         new_freq = fcd_get_freq();
+        //printf("%d,%d\n", new_freq,last_freq);
         if (last_freq != new_freq) {
             last_freq = new_freq;
             // Use the FCD controller software to set the frequency
