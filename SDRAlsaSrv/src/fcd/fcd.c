@@ -491,13 +491,12 @@ EXTERN FCD_API_EXPORT FCD_API_CALL FCD_MODE_ENUM fcdAppSetFreq(int nFreq)
     {
         // fcdClose(phd);
         // phd = NULL;
-
+        printf("Set freq: %d\n", nFreq);
         return FCD_MODE_APP;
     }
 
     // fcdClose(phd);
     // phd = NULL;
-
     return FCD_MODE_BL;
 }
 

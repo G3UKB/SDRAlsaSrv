@@ -70,6 +70,7 @@ void fcdif_imp(void* data){
             last_freq = new_freq;
             // Use the FCD controller software to set the frequency
             stat = fcdAppSetFreq(new_freq);
+            //printf("Sent freq: %d\n", new_freq);
             if (stat == FCD_MODE_NONE)
                 printf("No FCD Detected!\n");
             else if (stat == FCD_MODE_BL)

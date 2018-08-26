@@ -75,7 +75,7 @@ static void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
             freq = (int)(freq | (b2 << 16));
             freq = (int)(freq | (b1 << 8));
             freq = (int)(freq | b0);
-            //printf("Freq %d\n", freq);
+            //printf("Got freq: %d\n", freq);
             fcd_set_freq(freq);
         }
     }
