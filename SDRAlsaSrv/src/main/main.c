@@ -107,7 +107,7 @@ int main() {
 	rc = pthread_create(&alsa_thd, NULL, alsa_imp, (void *)alsa_td);
 	if (rc){
         printf("Failed to create ALSA thread [%d]\n", rc);
-        exit(1);;
+        exit(1);
 	}
 
 	//===========================================================================

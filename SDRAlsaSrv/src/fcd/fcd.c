@@ -485,6 +485,11 @@ EXTERN FCD_API_EXPORT FCD_API_CALL FCD_MODE_ENUM fcdAppSetFreq(int nFreq)
     aucBufOut[5] = (unsigned char)(nFreq>>24);
     hid_write(phd, aucBufOut, 65);
     memset(aucBufIn, 0xCC, 65); // Clear out the response buffer
+
+    //BC - hid_read hangs frequently so we have to assume it worked
+    return FCD_MODE_APP;
+
+    /*
     hid_read(phd, aucBufIn, 65);
 
     if (aucBufIn[0]==FCD_CMD_APP_SET_FREQ_HZ && aucBufIn[1]==1)
@@ -497,7 +502,9 @@ EXTERN FCD_API_EXPORT FCD_API_CALL FCD_MODE_ENUM fcdAppSetFreq(int nFreq)
 
     // fcdClose(phd);
     // phd = NULL;
+
     return FCD_MODE_BL;
+    */
 }
 
 
