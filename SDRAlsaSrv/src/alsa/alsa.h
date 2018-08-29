@@ -28,5 +28,7 @@ The authors can be reached by email at:
 #define _alsa_h
 
 void alsa_imp();
+void alsa_pause();
+void alsa_run();
 
 #endif

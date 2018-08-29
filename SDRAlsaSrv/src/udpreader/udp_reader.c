@@ -27,9 +27,12 @@ The authors can be reached by email at:
 // Includes
 #include "../common/include.h"
 
+#define STATE_DATA 0
+#define STATE_WAIT 1
+
 // Forward refs
 static void udprecvdata(int sd, struct sockaddr_in *cliAddr);
-
+int udp_reader_state = STATE_DATA;
 // Module vars
 unsigned char pcdata[METIS_FRAME_SZ];
 
@@ -61,22 +64,41 @@ static void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
     unsigned int addr_sz = sizeof(*cliAddr);
 
     // Read a frame size data packet
+    memset(pcdata, 0, METIS_FRAME_SZ);
     n = recvfrom(sd, pcdata, METIS_FRAME_SZ, 0, (struct sockaddr_in *)cliAddr, &addr_sz);
-    if(n == METIS_FRAME_SZ) {
-        // Extract the control bytes
-        if ((pcdata[11] & 0xFE) == 0x02) {
-            // Extract freq LSB in bo
-            b3 = pcdata[12];
-            b2 = pcdata[13];
-            b1 = pcdata[14];
-            b0 = pcdata[15];
-            // Format into an unsigned int as a frequency in Hz
-            freq = (int)(b3 << 24);
-            freq = (int)(freq | (b2 << 16));
-            freq = (int)(freq | (b1 << 8));
-            freq = (int)(freq | b0);
-            //printf("Got freq: %d\n", freq);
-            fcd_set_freq(freq);
+    if (udp_reader_state == STATE_DATA) {
+        if(n == METIS_FRAME_SZ) {
+            // Extract the control bytes
+            if ((pcdata[11] & 0xFE) == 0x02) {
+                // Extract freq LSB in bo
+                b3 = pcdata[12];
+                b2 = pcdata[13];
+                b1 = pcdata[14];
+                b0 = pcdata[15];
+                // Format into an unsigned int as a frequency in Hz
+                freq = (int)(b3 << 24);
+                freq = (int)(freq | (b2 << 16));
+                freq = (int)(freq | (b1 << 8));
+                freq = (int)(freq | b0);
+                //printf("Got freq: %d\n", freq);
+                fcd_set_freq(freq);
+            }
+        } else if (n>0) {
+            // Check for a stop message
+            if (pcdata[2] == 0x04) {
+                printf("Stop, pausing stream...\n");
+                alsa_pause();
+                udp_writer_pause();
+                udp_reader_state = STATE_WAIT;
+            }
+        }
+    } else {
+        // Wait for a start message
+        if (pcdata[2] == 0x04) {
+            printf("Start, running stream...\n");
+            alsa_run();
+            udp_writer_run();
+            udp_reader_state = STATE_DATA;
         }
     }
 }

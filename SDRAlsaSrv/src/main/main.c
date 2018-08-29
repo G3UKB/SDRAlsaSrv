@@ -101,6 +101,7 @@ int main() {
 	alsa_td = (alsa_thread_data*)safealloc(sizeof(alsa_thread_data), sizeof(char), "ALSA_TD_STRUCT");
 	// Init with thread data items
 	alsa_td->terminate = FALSE;
+	alsa_td->pause = FALSE;
     alsa_td->rb = rb_iq;
 
 	// Create the ALSA thread
@@ -116,6 +117,7 @@ int main() {
 	udp_writer_td = (udp_thread_data*)safealloc(sizeof(udp_thread_data), sizeof(char), "UDP_TD_STRUCT");
 	// Init with thread data items
 	udp_writer_td->terminate = FALSE;
+	udp_writer_td->pause = FALSE;
     udp_writer_td->rb = rb_iq;
     udp_writer_td->socket = sd;
     udp_writer_td->cli_addr = cli_addr;

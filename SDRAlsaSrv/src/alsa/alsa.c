@@ -27,6 +27,9 @@ The authors can be reached by email at:
 // Includes
 #include "../common/include.h"
 
+#define ALSA_PAUSED 0
+#define ALSA_RUN 1
+
 // Forward decs
 static int alsa_init();
 static void alsa_clean();
@@ -39,6 +42,19 @@ snd_pcm_t *handle;              // ALSA device handle
 snd_pcm_hw_params_t *hw_params; // ALSA hardware params
 snd_pcm_sw_params_t *sw_params; // ALSA software params
 short *buffer = NULL;           // The read buffer
+int alsa_state = ALSA_RUN;
+int msg_done = FALSE;
+
+void alsa_pause() {
+    alsa_td->pause = TRUE;
+    alsa_state = ALSA_PAUSED;
+}
+
+void alsa_run() {
+    alsa_td->pause = FALSE;
+    alsa_state = ALSA_RUN;
+    msg_done = FALSE;
+}
 
 // Thread entry point for ALSA processing
 void alsa_imp(void* data){
@@ -53,7 +69,11 @@ void alsa_imp(void* data){
     }
 
     while (td->terminate == FALSE) {
-        alsa_read_frame();
+        if (!td->pause)
+            alsa_read_frame();
+        else {
+            sleep(0.1);
+        }
     }
 
     alsa_clean();
@@ -62,7 +82,7 @@ void alsa_imp(void* data){
 
 // Clean up
 static void alsa_clean() {
-    snd_pcm_drain(handle);
+    snd_pcm_drop(handle);
     snd_pcm_close(handle);
     if (buffer != NULL ) free(buffer);
 }
@@ -219,7 +239,10 @@ static void alsa_read_frame()
             if (ringb_write_space (rb) > frames*4) {
 				ringb_write (rb, (char *)buffer, frames*4);
 			} else {
-                printf("Ring buffer is full, skipping samples...\n");
+			    if (!msg_done) {
+                    printf("Ring buffer is full, skipping samples...\n");
+                    msg_done = TRUE;
+			    }
 			}
         }
     }

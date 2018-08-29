@@ -35,5 +35,7 @@ The authors can be reached by email at:
 
 // Prototypes
 void udp_writer_imp();
+void udp_writer_pause();
+void udp_writer_run();
 
 #endif

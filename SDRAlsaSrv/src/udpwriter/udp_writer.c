@@ -30,6 +30,14 @@ The authors can be reached by email at:
 short *smpl_buffer;
 unsigned char *packet_buffer;
 
+void udp_writer_pause () {
+    udp_writer_td->pause = TRUE;
+}
+
+void udp_writer_run () {
+    udp_writer_td->pause = FALSE;
+}
+
 // Thread entry point for ALSA processing
 void udp_writer_imp(void* data){
     // Get our thread parameters
@@ -45,18 +53,23 @@ void udp_writer_imp(void* data){
 
     // Loop until terminated
     while (td->terminate == FALSE) {
-
         // Check data availability
-        if (ringb_read_space (rb) > READ_SZ) {
-            // Read one frames worth
-            ringb_read (rb, (char*)smpl_buffer, READ_SZ);
-            // Format into a protocol 1 frame
-            packet_buffer = fmtframe((short *)smpl_buffer);
-            // Dispatch to client
-            if (sendto(sd, packet_buffer, METIS_FRAME_SZ, 0, (struct sockaddr*)cli_addr, sizeof(*cli_addr)) == -1)
-            {
-                printf("Send packet data failed!\n");
+        if (!td->pause) {
+            if (ringb_read_space (rb) > READ_SZ) {
+                // Read one frames worth
+                ringb_read (rb, (char*)smpl_buffer, READ_SZ);
+                // Format into a protocol 1 frame
+                packet_buffer = fmtframe((short *)smpl_buffer);
+                // Dispatch to client
+                if (sendto(sd, packet_buffer, METIS_FRAME_SZ, 0, (struct sockaddr*)cli_addr, sizeof(*cli_addr)) == -1)
+                {
+                    printf("Send packet data failed!\n");
+                }
+            } else {
+                sleep(0.01);
             }
+        } else {
+            sleep(0.1);
         }
     }
     printf("UDP Writer thread exiting...\n");
