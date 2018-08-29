@@ -69,7 +69,6 @@ static int udprecvcontrol(int sd) {
     memset(msg,0x0,MAX_MSG);
     // receive message
     n = recvfrom(sd, msg, MAX_MSG, 0, (struct sockaddr *) &cliAddr, &cliLen);
-
     if(n<0) {
         return READ_FAILURE;
     }

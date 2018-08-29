@@ -62,6 +62,12 @@ int main() {
     // Set an exit handler
     signal(SIGINT, INThandler);
 
+    // Initialise thread data structures
+    alsa_td = (alsa_thread_data *)NULL;
+    udp_writer_td = (udp_thread_data *)NULL;
+    udp_reader_td = (udp_thread_data *)NULL;
+    fcd_td = (fcd_thread_data *)NULL;
+
     //===========================================================================
     // Do discovery protocol 1 as per HPSDR
     if ((sd = open_bc_socket()) == -1) {
@@ -241,14 +247,14 @@ void  INThandler(int sig)
      c = getchar();
      if (c == 'y' || c == 'Y') {
         printf("SDR ALSA Server exiting...\n");
-        alsa_td->terminate = TRUE;
-        udp_writer_td->terminate = TRUE;
-        udp_reader_td->terminate = TRUE;
-        fcd_td->terminate = TRUE;
+        if (alsa_td != NULL) alsa_td->terminate = TRUE;
+        if (udp_writer_td != NULL) udp_writer_td->terminate = TRUE;
+        if (udp_reader_td != NULL) udp_reader_td->terminate = TRUE;
+        if (fcd_td != NULL) fcd_td->terminate = TRUE;
         sleep(1);
         exit(0);
      }
      else
-          signal(SIGINT, INThandler);
+        signal(SIGINT, INThandler);
      getchar(); // Get new line character
 }
