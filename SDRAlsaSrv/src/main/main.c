@@ -243,7 +243,7 @@ void  INThandler(int sig)
      char  c;
 
      signal(sig, SIG_IGN);
-     printf("Do you really want to quit? [y/n] ");
+     printf("\nDo you really want to quit? [y/n] ");
      c = getchar();
      if (c == 'y' || c == 'Y') {
         printf("SDR ALSA Server exiting...\n");
