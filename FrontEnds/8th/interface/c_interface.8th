@@ -1,0 +1,98 @@
+(* 
+	c_interface
+ 
+  C interface to the SDRAlsaSVR shared lib
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Set namespace
+ns: fcd
+
+\ ===============================================================================
+\ SDRAlsaClient library management
+\ Create a s4 to control library access
+\ We must only have one call in progress across all calling threads at any one time
+"lib-s4" 1 G:sem var, lib_s4
+: claim_lib_s4	\ --
+	"lib-s4" 0 G:sem lib_s4 !
+;
+: rel_lib_s4	\ --
+	lib_s4 @ sem-post
+;
+: wait_lib_s4	\ --
+	lib_s4 @ sem-wait
+;
+: wait?_lib_s4	\ -- f
+	lib_s4 @ sem-wait?
+;
+
+\ Declare the external library
+\ "..\\..\\C\\SDRFlow\\bin\\Debug\\SDRFlow.dll" lib SDRFlow
+\ FIXME - Make this something sensible in the future
+"./libSDRAlsaLib.so" lib SDRAlsaLib
+
+\ Load the SDRAlsaClient library
+: load_library	\	--
+	SDRAlsaLib null? if "Load library SDRAlsaLib failed" throw then
+	"SDRAlsaLib loaded" drop ;
+	
+\ Load library
+ load_library
+ 
+\ ========================================
+\ Get a reference to all library functions
+\ Server management functions
+"N" "main" func: cc_main
+drop
+
+\ ===============================================================================
+\ Helper words
+
+
+\ ===============================================================================
+\ Direct calls from clients i.e. not events
+
+\ Audio
+\ Enumerate the audio inputs available
+\ : c_i_server_enum_audio_inputs	\	-- Json string
+\	c_c_server_enum_audio_inputs json>
+\ ;
+
+\ Enumerate the audio outputs available	
+\ : c_i_server_enum_audio_outputs	\	-- Json string
+\	c_c_server_enum_audio_outputs json>
+\ ;
+
+\ Main interface
+: c_run_client	\ -- rc
+	wait_lib_s4
+	cc_main
+	rel_lib_s4
+;
+
+\ Testing only
+: test
+	c_run_client
+;
+test
+
+
+\ Restore namespace	
+ns: user	
