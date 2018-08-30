@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="SDRAlsaLib" />
+		<Option pch_mode="2" />
+		<Option compiler="arm-elf-gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/libSDRAlsaLib.so" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="arm-elf-gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/libSDRAlsaLib.so" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="arm-elf-gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="src/alsa/alsa.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/alsa/alsa.h" />
+		<Unit filename="src/common/include.h" />
+		<Unit filename="src/discover/discover.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/discover/discover.h" />
+		<Unit filename="src/fcd/fcd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/fcd/fcd.h" />
+		<Unit filename="src/fcd/fcdhidcmd.h" />
+		<Unit filename="src/fcd/fcdif.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/fcd/fcdif.h" />
+		<Unit filename="src/fcd/hid-libusb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/fcd/hidapi.h" />
+		<Unit filename="src/formatter/formatter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/formatter/formatter.h" />
+		<Unit filename="src/main/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/main/main.h" />
+		<Unit filename="src/ringbuffer/ringb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ringbuffer/ringb.h" />
+		<Unit filename="src/udpreader/udp_reader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/udpreader/udp_reader.h" />
+		<Unit filename="src/udpwriter/udp_writer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/udpwriter/udp_writer.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

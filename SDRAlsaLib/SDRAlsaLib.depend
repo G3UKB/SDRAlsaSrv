@@ -1,0 +1,112 @@
+# depslib dependency file v1.0
+1535541681 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\alsa\alsa.c
+	"../common/include.h"
+
+1535560798 e:\projects\sdralsasrv\trunk\sdralsalib\src\common\include.h
+	<sys/types.h>
+	<sys/socket.h>
+	<sys/time.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+	<netdb.h>
+	<stdio.h>
+	<unistd.h>
+	<string.h>
+	<fcntl.h>
+	<errno.h>
+	<math.h>
+	<signal.h>
+	<sys/ioctl.h>
+	<linux/usbdevice_fs.h>
+	<pthread.h>
+	<alsa/asoundlib.h>
+	"../ringbuffer/ringb.h"
+	"../alsa/alsa.h"
+	"../formatter/formatter.h"
+	"../discover/discover.h"
+	"../fcd/fcdif.h"
+	"../fcd/fcd.h"
+	"../fcd/fcdhidcmd.h"
+	"../fcd/hidapi.h"
+	"../udpreader/udp_reader.h"
+	"../udpwriter/udp_writer.h"
+	"../main/main.h"
+
+1447704009 e:\projects\sdralsasrv\trunk\sdralsalib\src\ringbuffer\ringb.h
+	<stdlib.h>
+	<sys/types.h>
+
+1535538758 e:\projects\sdralsasrv\trunk\sdralsalib\src\alsa\alsa.h
+
+1532016747 e:\projects\sdralsasrv\trunk\sdralsalib\src\formatter\formatter.h
+
+1532010501 e:\projects\sdralsasrv\trunk\sdralsalib\src\discover\discover.h
+
+1532082671 e:\projects\sdralsasrv\trunk\sdralsalib\src\fcd\fcdif.h
+
+1433454924 e:\projects\sdralsasrv\trunk\sdralsalib\src\fcd\fcd.h
+	<inttypes.h>
+
+1433454924 e:\projects\sdralsasrv\trunk\sdralsalib\src\fcd\fcdhidcmd.h
+
+1433454924 e:\projects\sdralsasrv\trunk\sdralsalib\src\fcd\hidapi.h
+	<wchar.h>
+
+1532079017 e:\projects\sdralsasrv\trunk\sdralsalib\src\udpreader\udp_reader.h
+
+1535538792 e:\projects\sdralsasrv\trunk\sdralsalib\src\udpwriter\udp_writer.h
+
+1535561179 e:\projects\sdralsasrv\trunk\sdralsalib\src\main\main.h
+
+1535559568 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\discover\discover.c
+	"../common/include.h"
+
+1535366194 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\fcd\fcd.c
+	<string.h>
+	<malloc.h>
+	<stdlib.h>
+	"hidapi.h"
+	"fcd.h"
+	"fcdhidcmd.h"
+	<stdio.h>
+
+1535321599 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\fcd\fcdif.c
+	"../common/include.h"
+
+1531517715 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\fcd\hid-libusb.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<ctype.h>
+	<locale.h>
+	<errno.h>
+	<unistd.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<sys/ioctl.h>
+	<sys/utsname.h>
+	<fcntl.h>
+	<pthread.h>
+	<wchar.h>
+	"libusb.h"
+	"iconv.h"
+	"hidapi.h"
+
+1532170097 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\formatter\formatter.c
+	"../common/include.h"
+
+1535563832 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\main\main.c
+	"../common/include.h"
+
+1466105970 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\ringbuffer\ringb.c
+	"ringb.h"
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+
+1535541227 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\udpreader\udp_reader.c
+	"../common/include.h"
+
+1535537471 source:e:\projects\sdralsasrv\trunk\sdralsalib\src\udpwriter\udp_writer.c
+	"../common/include.h"
+
