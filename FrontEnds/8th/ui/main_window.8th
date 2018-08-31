@@ -59,10 +59,33 @@ ns: fcd
 						"fg" : "orangered2",
 						"bg" : "gray1",
 						"font" : 13,
-						"bounds" : "0,0,50",
+						"bounds" : "0,0,100,100",
 						"click" : "fcd:run_stream"
 				},
-				
+				{
+						"kind" : "btn",
+						"name" : "reset-btn",
+						"label" : "Reset",
+						"bg0" : "gray10",
+						"fg0" : "gold3",
+						"fg" : "orangered2",
+						"bg" : "gray1",
+						"font" : 13,
+						"bounds" : "100,0,200,100",
+						"click" : "fcd:reset_stream"
+				},
+				{
+						"kind" : "btn",
+						"name" : "close-btn",
+						"label" : "Close",
+						"bg0" : "gray10",
+						"fg0" : "gold3",
+						"fg" : "orangered2",
+						"bg" : "gray1",
+						"font" : 13,
+						"bounds" : "200,0,300,100",
+						"click" : "fcd:close_stream"
+				}
 			]
 		}
 	]
@@ -73,29 +96,17 @@ ns: fcd
 \ Window management
 
 : main_window_init	\ --
-	"VFO-1" "0,0,330,50" vfo_new dup
-	main_window @ "vfo-box" g:child swap g:+child
-	drop vfo_init
+	main_window_obj @ g:new
 ;
 
 \ ============================================================================
 \ Event management
-: start_stream	\ g --
-	g:on? if
-		\ start
-		c_do_start
-		"Stop" g:text
-	else
-		\ stop
-		c_do_stop
-		"Start" g:text
-	then
-;
-
-: audio_input_source	\ g --
-;
 
 \ ============================================================================
+
+\ ============================================================================		
+\ Testing
+main_window_init
 
 \ ============================================================================		
 \ Restore namespace	
