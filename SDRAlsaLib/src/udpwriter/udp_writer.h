@@ -34,7 +34,7 @@ The authors can be reached by email at:
 #define READ_SZ 63*2*4    // bytes
 
 // Prototypes
-void udp_writer_imp();
+void *udp_writer_imp(void* data);
 void udp_writer_pause();
 void udp_writer_run();
 

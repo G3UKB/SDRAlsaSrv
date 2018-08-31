@@ -39,7 +39,7 @@ void udp_writer_run () {
 }
 
 // Thread entry point for ALSA processing
-void udp_writer_imp(void* data){
+void *udp_writer_imp(void* data){
     // Get our thread parameters
     udp_thread_data* td = (udp_thread_data*)data;
     ringb_t *rb = td->rb;

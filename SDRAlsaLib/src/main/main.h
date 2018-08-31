@@ -33,16 +33,29 @@ The authors can be reached by email at:
 // Constants
 #define METIS_FRAME_SZ 1032
 
+#define STATE_RUNNING 0
+#define STATE_SUCCESS 1
+#define STATE_ERROR 2
+
 //==================================================================
 // Ring buffer to hold audio samples
 ringb_t *rb_iq;
 
 //==================================================================
 // Threads for audio capture and UDP dispatch
+pthread_t run_thd;
 pthread_t alsa_thd;
 pthread_t udp_writer_thd;
 pthread_t udp_reader_thd;
 pthread_t fcd_thd;
+
+// Thread data structure for run
+typedef struct run_thread_data {
+    int run;
+    int terminate;
+    int state;
+}run_thread_data;
+run_thread_data *run_td;
 
 // Thread data structure for ALSA
 typedef struct alsa_thread_data {
@@ -71,7 +84,7 @@ fcd_thread_data *fcd_td;
 
 // Prototypes
 int lib_init();
-int lib_run();
+int lib_state();
 void lib_close();
 int lib_reset();
 

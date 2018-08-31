@@ -28,6 +28,6 @@ The authors can be reached by email at:
 #define _udp_reader_h
 
 // Prototypes
-void udp_reader_imp();
+void *udp_reader_imp(void* data);
 
 #endif

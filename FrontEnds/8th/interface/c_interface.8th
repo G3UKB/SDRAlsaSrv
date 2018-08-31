@@ -26,7 +26,7 @@
 ns: fcd
 
 \ ===============================================================================
-\ SDRAlsaClient library management
+\ SDRAlsaLib library management
 \ Create a s4 to control library access
 \ We must only have one call in progress across all calling threads at any one time
 "lib-s4" 1 G:sem var, lib_s4
@@ -44,8 +44,6 @@ ns: fcd
 ;
 
 \ Declare the external library
-\ "..\\..\\C\\SDRFlow\\bin\\Debug\\SDRFlow.dll" lib SDRFlow
-\ FIXME - Make this something sensible in the future
 "./libSDRAlsaLib.so" lib SDRAlsaLib
 
 \ Load the SDRAlsaClient library
@@ -59,40 +57,53 @@ ns: fcd
 \ ========================================
 \ Get a reference to all library functions
 \ Server management functions
-"N" "main" func: cc_main
+"N" "lib_init" func: cc_lib_init
+"N" "lib_run" func: cc_lib_run
+"N" "lib_state" func: cc_lib_state
+"V" "lib_close" func: cc_lib_close
+"V" "lib_reset" func: cc_lib_reset
+drop
 drop
 
 \ ===============================================================================
-\ Helper words
+\ Interface words
+: c_lib_init	\ -- rc
+	\ wait_lib_s4
+	cc_lib_init
+	\ rel_lib_s4
+;
 
+: c_lib_run	\ -- rc
+	\ wait_lib_s4
+	cc_lib_run
+	\ rel_lib_s4
+;
 
-\ ===============================================================================
-\ Direct calls from clients i.e. not events
+: c_lib_state	\ -- rc
+	\ wait_lib_s4
+	cc_lib_state
+	\ rel_lib_s4
+;
 
-\ Audio
-\ Enumerate the audio inputs available
-\ : c_i_server_enum_audio_inputs	\	-- Json string
-\	c_c_server_enum_audio_inputs json>
-\ ;
+: c_lib_close	\ -- rc
+	\ wait_lib_s4
+	cc_lib_close
+	\ rel_lib_s4
+;
 
-\ Enumerate the audio outputs available	
-\ : c_i_server_enum_audio_outputs	\	-- Json string
-\	c_c_server_enum_audio_outputs json>
-\ ;
-
-\ Main interface
-: c_run_client	\ -- rc
-	wait_lib_s4
-	cc_main
-	rel_lib_s4
+: c_lib_reset	\ -- rc
+	\ wait_lib_s4
+	cc_lib_reset
+	\ rel_lib_s4
 ;
 
 \ Testing only
 : test
-	c_run_client
+	c_lib_init
+	c_lib_run
 ;
-test
 
+test
 
 \ Restore namespace	
 ns: user	

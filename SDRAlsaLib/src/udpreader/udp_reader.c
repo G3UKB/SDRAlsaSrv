@@ -37,7 +37,7 @@ int udp_reader_state = STATE_DATA;
 unsigned char pcdata[METIS_FRAME_SZ];
 
 // Thread entry point for ALSA processing
-void udp_reader_imp(void* data){
+void *udp_reader_imp(void* data){
     // Get our thread parameters
     udp_thread_data* td = (udp_thread_data*)data;
     int sd = td->socket;
