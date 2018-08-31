@@ -25,16 +25,6 @@ The authors can be reached by email at:
 	bob@bobcowdery.plus.com
 */
 
-/*
-ToDo :
-    1. Use conditions rather than sleeps in threads.
-    2. Maybe use select rather than straight write/read. Also look at the timeout value on reads.
-    3. Reduce CPU usage.
-    4. Try a Pi3 - is networking better?
-    5. Extend freq range of my app up to 2GHz.
-    6. Send back sufficient data to make it work with HPSDR programs.
-*/
-
 // Includes
 #include "../common/include.h"
 
@@ -43,24 +33,21 @@ ToDo :
 #define iq_ring_byte_sz 10*1024*4
 
 // Forward decs
-int open_bc_socket();
-int revert_sd(int sd);
-void INThandler(int sig);
+static int open_bc_socket();
+static int revert_sd(int sd);
 
 // Module vars
 struct sockaddr_in *cli_addr;
 int sd;
 
-// Program entry point
-int main() {
+//===============================================================================
+// Lib initialisation
+int lib_init() {
 
     // Local variables
     int rc, iq_ring_sz;
 
-    printf("SDR ALSA Server starting...\n");
-
-    // Set an exit handler
-    signal(SIGINT, INThandler);
+    printf("SDR ALSA Lib initialising...\n");
 
     // Initialise thread data structures
     alsa_td = (alsa_thread_data *)NULL;
@@ -69,20 +56,10 @@ int main() {
     fcd_td = (fcd_thread_data *)NULL;
 
     //===========================================================================
-    // Do discovery protocol 1 as per HPSDR
+    // Open a broadcast socket
     if ((sd = open_bc_socket()) == -1) {
         printf("Failed to open broadcast socket!\n");
-        exit(1);
-    }
-    cli_addr = do_discover(sd);
-    if (cli_addr == (struct sockaddr_in *)NULL) {
-        printf("Sorry, discovery protocol failed!\n");
-        exit(1);
-    }
-
-    if (!revert_sd(sd)) {
-        printf("Sorry, failed to revert socket!\n");
-        exit(1);
+        return FALSE;
     }
 
     //===========================================================================
@@ -94,12 +71,32 @@ int main() {
     // Init FCD
     if( fcdOpen() == (hid_device*)NULL ) {
         printf("No FCD Detected!\n");
-        exit(1);
+        return FALSE;
     }
 
     //===========================================================================
     // Init formatting
     fmtinit();
+
+    return TRUE;
+}
+
+//===============================================================================
+// Run lib
+int lib_run()
+{
+    //===========================================================================
+    // Do discovery protocol
+    cli_addr = do_discover(sd);
+    if (cli_addr == (struct sockaddr_in *)NULL) {
+        printf("Sorry, discovery protocol failed!\n");
+        return FALSE;
+    }
+
+    if (!revert_sd(sd)) {
+        printf("Sorry, failed to revert socket!\n");
+        return FALSE;
+    }
 
     //===========================================================================
     // ALSA init
@@ -114,7 +111,7 @@ int main() {
 	rc = pthread_create(&alsa_thd, NULL, alsa_imp, (void *)alsa_td);
 	if (rc){
         printf("Failed to create ALSA thread [%d]\n", rc);
-        exit(1);
+        return FALSE;
 	}
 
 	//===========================================================================
@@ -132,7 +129,7 @@ int main() {
 	rc = pthread_create(&udp_writer_thd, NULL, udp_writer_imp, (void *)udp_writer_td);
 	if (rc){
         printf("Failed to create UDP writer thread [%d]\n", rc);
-        exit(1);;
+        return FALSE;
 	}
 
 	//===========================================================================
@@ -149,7 +146,7 @@ int main() {
 	rc = pthread_create(&udp_reader_thd, NULL, udp_reader_imp, (void *)udp_reader_td);
 	if (rc){
         printf("Failed to create UDP reader thread [%d]\n", rc);
-        exit(1);
+        return FALSE;
 	}
 
 	//===========================================================================
@@ -163,21 +160,51 @@ int main() {
 	rc = pthread_create(&fcd_thd, NULL, fcdif_imp, (void *)fcd_td);
 	if (rc){
         printf("Failed to create FCD thread [%d]\n", rc);
-        exit(1);
+        return FALSE;
 	}
+}
 
-    // Wait for the exit signal
-	while(1) {
-        pause();
-	}
+//===============================================================================
+// Tidy close
+void lib_close()
+{
+    printf("SDR ALSA Lib closing...\n");
+    if (alsa_td != NULL) {
+        alsa_td->terminate = TRUE;
+        pthread_join(alsa_thd);
+    }
+    if (udp_writer_td != NULL) {
+        udp_writer_td->terminate = TRUE;
+        pthread_join(udp_writer_thd);
+    }
+    if (udp_reader_td != NULL) {
+        udp_reader_td->terminate = TRUE;
+        pthread_join(udp_reader_thd);
+    }
+    if (fcd_td != NULL) {
+        fcd_td->terminate = TRUE;
+        pthread_join(fcd_thd);
+    }
+}
+
+//===============================================================================
+// Reset to wait for broadcast message
+int lib_reset()
+{
 
 }
 
+//===============================================================================
+// Local methods
 // Open a broadcast socket
-int open_bc_socket() {
+static int open_bc_socket() {
     int sd, rc;
     int  broadcast = 1;
     struct sockaddr_in serv_addr;
+    struct timeval recv_timeout;
+    recv_timeout.tv_sec = 0;
+    recv_timeout.tv_usec = 100000;
+
 
     // Create socket
     sd=socket(AF_INET, SOCK_DGRAM, 0);
@@ -189,6 +216,12 @@ int open_bc_socket() {
     // Set to broadcast
     if (setsockopt(sd, SOL_SOCKET, SO_BROADCAST, &broadcast,sizeof broadcast) == -1) {
         printf("Failed to set SO_BROADCAST!\n");
+        return -1;
+    }
+
+    // Set a timeout
+    if (setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &recv_timeout,sizeof recv_timeout) == -1) {
+        printf("Failed to set SO_RCVTIMEO!\n");
         return -1;
     }
 
@@ -206,13 +239,13 @@ int open_bc_socket() {
 }
 
 // Revert broadcast socket to a normal socket
-int revert_sd(int sd) {
+static int revert_sd(int sd) {
     int broadcast = 0;
     int sendbuff = 32000;
     int recvbuff = 32000;
     struct timeval tv;
     tv.tv_sec = 0;
-    tv.tv_usec = 10;
+    tv.tv_usec = 100;
 
     // Turn off broadcast
     if (setsockopt(sd, SOL_SOCKET, SO_BROADCAST, &broadcast,sizeof broadcast) == -1) {
@@ -237,24 +270,4 @@ int revert_sd(int sd) {
     return TRUE;
 }
 
-// SIGINT Handler
-void  INThandler(int sig)
-{
-     char  c;
 
-     signal(sig, SIG_IGN);
-     printf("\nDo you really want to quit? [y/n] ");
-     c = getchar();
-     if (c == 'y' || c == 'Y') {
-        printf("SDR ALSA Server exiting...\n");
-        if (alsa_td != NULL) alsa_td->terminate = TRUE;
-        if (udp_writer_td != NULL) udp_writer_td->terminate = TRUE;
-        if (udp_reader_td != NULL) udp_reader_td->terminate = TRUE;
-        if (fcd_td != NULL) fcd_td->terminate = TRUE;
-        sleep(1);
-        exit(0);
-     }
-     else
-        signal(SIGINT, INThandler);
-     getchar(); // Get new line character
-}

@@ -69,4 +69,10 @@ typedef struct fcd_thread_data {
 }fcd_thread_data;
 fcd_thread_data *fcd_td;
 
+// Prototypes
+int lib_init();
+int lib_run();
+void lib_close();
+int lib_reset();
+
 #endif
