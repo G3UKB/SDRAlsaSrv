@@ -1,0 +1,102 @@
+(*
+	main_window.8th
+ 
+  Main window for the SDRAlsaSrv application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ ============================================================================
+
+\ Define our SDR namespace
+ns: fcd
+
+\ ========================================
+\ Main window
+{
+	"kind" : "win",
+	"title" : "SDRAlsaServer",
+	"visible" : true,
+	"bg" : "gray10",
+	"resize-corner" : 20,
+	"wide" : 330,
+	"high" : 150,
+	"center" : true,
+	"ontop" : false,
+	"font" : "Arial 10",
+	"children" :
+	[
+		{
+				"kind" : "box",
+				"name" : "main-box",
+				"bounds" : "0,0,parent.width,parent.height",
+				"bg" : "gray10",
+				"children" :
+			[
+				{
+						"kind" : "btn",
+						"name" : "run-btn",
+						"autotoggle" : true,
+						"label" : "Run",
+						"bg0" : "gray10",
+						"fg0" : "gold3",
+						"fg" : "orangered2",
+						"bg" : "gray1",
+						"font" : 13,
+						"bounds" : "0,0,50",
+						"click" : "fcd:run_stream"
+				},
+				
+			]
+		}
+	]
+} var, main_window_obj
+
+\ ===============================================================================
+\ ============================================================================
+\ Window management
+
+: main_window_init	\ --
+	"VFO-1" "0,0,330,50" vfo_new dup
+	main_window @ "vfo-box" g:child swap g:+child
+	drop vfo_init
+;
+
+\ ============================================================================
+\ Event management
+: start_stream	\ g --
+	g:on? if
+		\ start
+		c_do_start
+		"Stop" g:text
+	else
+		\ stop
+		c_do_stop
+		"Start" g:text
+	then
+;
+
+: audio_input_source	\ g --
+;
+
+\ ============================================================================
+
+\ ============================================================================		
+\ Restore namespace	
+ns: user	

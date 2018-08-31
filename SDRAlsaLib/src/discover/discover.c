@@ -68,12 +68,11 @@ static int udprecvcontrol(int sd) {
     // Clear message buffer
     memset(msg,0x0,MAX_MSG);
     // receive message
-    while(TRUE) {
-        n = recvfrom(sd, msg, MAX_MSG, 0, (struct sockaddr *) &cliAddr, &cliLen);
-        if(n<0) {
-            // Failure
-            return READ_FAILURE;
-        }
+
+    n = recvfrom(sd, msg, MAX_MSG, 0, (struct sockaddr *) &cliAddr, &cliLen);
+    if(n<0) {
+        // Failure as no timeout set
+        return READ_FAILURE;
     }
 
     // Announce

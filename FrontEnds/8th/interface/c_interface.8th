@@ -63,7 +63,6 @@ ns: fcd
 "V" "lib_close" func: cc_lib_close
 "V" "lib_reset" func: cc_lib_reset
 drop
-drop
 
 \ ===============================================================================
 \ Interface words
@@ -99,11 +98,17 @@ drop
 
 \ Testing only
 : test
-	c_lib_init
+	c_lib_init 0 n:= "Init Error!" log ;;
 	c_lib_run
+	
+	repeat
+		0.5 sleep
+		c_lib_state 0 n:= if "Init error!" log ;; then
+	while
+	"Exiting..." log
 ;
 
 test
-
+bye
 \ Restore namespace	
 ns: user	
