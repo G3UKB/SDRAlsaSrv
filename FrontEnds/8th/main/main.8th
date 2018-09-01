@@ -1,0 +1,99 @@
+(* 
+	main
+ 
+  main application for the SDRAlsaSrv application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ needs debug/nicer	
+\ needs debug/trace-crash
+\ needs debug/trace
+\ ( "EXCEPT: " . . cr bye ) w:is handler
+
+\ Define our FCD namespace
+ns: fcd
+
+\ Set our app name
+"SDRAlsaServer" appname !
+
+\ Make this a gui app
+true app:isgui !
+false log-async
+
+\ Include mode
+\ We use dev-includes.8th for development because using app:asset all the files are pulled into one
+\ and any compile errors are reported with a line number relative to the main file.
+: do_includes
+	app:standalone @ if
+		"includes.8th" app:asset eval
+	else
+		"dev-includes.8th" f:include
+	then
+;
+do_includes
+
+: fcd:task_wait \ key item --
+	"Waiting for task " . over . cr
+	t:wait
+;
+
+: fcd:cleanup
+	"Shutdown in progress" log
+	
+	\ Terminate tasks
+	
+;
+
+: app:main
+	"MainThrd" t:name!
+	t:curtask . cr
+	\ Pretty print Json
+	2 G:json-pretty
+	
+	\ Need pro version to create a new laf
+	\ 1 g:laf!
+	
+	\ ===================================================
+	\ MAIN WINDOW
+	\ Create main window
+	fcd:main_window_obj @ g:new
+	\ Store main window GUI
+	fcd:main_window !
+	fcd:main_window_init
+	
+  \ ===================================================
+  \ C INTERFACE
+  
+  \ ===================================================
+  \ RUN
+  \ Free run main thread
+  
+  
+	\ ===================================================
+  \ Set our cleanup word
+  ' fcd:cleanup onexit
+  \ On exit the GUI event loop is started
+;
+	
+\ Restore namespace	
+ns: user		
+	
+
+	

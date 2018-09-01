@@ -27,6 +27,8 @@
 \ Define our SDR namespace
 ns: fcd
 
+var main_window
+
 \ ========================================
 \ Main window
 {
@@ -96,7 +98,7 @@ ns: fcd
 \ Window management
 
 : main_window_init	\ --
-	main_window_obj @ g:new
+	
 ;
 
 \ ============================================================================
@@ -104,9 +106,19 @@ ns: fcd
 
 \ ============================================================================
 
-\ ============================================================================		
-\ Testing
-main_window_init
+: run_stream	\ g --
+	c_lib_init 0 n:= if "Lib init error!" log ;; then
+	c_lib_run
+;
+
+: reset_stream	\ g --
+	c_lib_reset 0 n:= if "Lib reset error!" log then
+;
+
+: close_stream	\ g --
+	c_lib_close
+;
+
 
 \ ============================================================================		
 \ Restore namespace	
