@@ -61,14 +61,11 @@ do_includes
 	
 ;
 
+\ ===================================================
+\ Entry point
 : app:main
 	"MainThrd" t:name!
 	t:curtask . cr
-	\ Pretty print Json
-	2 G:json-pretty
-	
-	\ Need pro version to create a new laf
-	\ 1 g:laf!
 	
 	\ ===================================================
 	\ MAIN WINDOW
@@ -78,20 +75,30 @@ do_includes
 	fcd:main_window !
 	fcd:main_window_init
 	
-  \ ===================================================
-  \ C INTERFACE
-  
-  \ ===================================================
-  \ RUN
-  \ Free run main thread
-  
-  
 	\ ===================================================
   \ Set our cleanup word
   ' fcd:cleanup onexit
   \ On exit the GUI event loop is started
+  
+  \ Run the monitor task
+  ' monitor_task t:task
+  
+  \ Hand over to the event loop
 ;
+
+\ ===================================================
+\ Monitor for errors
+: LIB_ERROR 2 ;
+: monitor_task	\ --
+	"MonitorThrd" t:name!
+	t:curtask . cr
+	repeat
+		c_lib_state LIB_ERROR n:= if "Library error... exiting!" . cr die then
+		0.5 sleep
+	again
 	
+;
+
 \ Restore namespace	
 ns: user		
 	
