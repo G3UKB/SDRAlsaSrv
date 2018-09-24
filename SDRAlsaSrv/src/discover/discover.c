@@ -110,6 +110,7 @@ static int udpsendresp(int sd, int type) {
         resp[8] = 0x01;
         // Frig Metis address to 1.8
         resp[9] = 0x18;
+        resp[10] = 0xFF;
 
         //Send discovery response packet
         if (sendto(sd, resp, MAX_RESP, 0, (struct sockaddr*) &cliAddr, sizeof(cliAddr)) == -1)
