@@ -37,11 +37,21 @@ static int fcd_get_freq();
 pthread_mutex_t fcd_mutex = PTHREAD_MUTEX_INITIALIZER;
 int freq_hz;
 int last_freq = -1;
+int thrd_last_freq = -1;
+
+pthread_mutex_t wait_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t wait_con = PTHREAD_COND_INITIALIZER;
+
 
 // Safe set frequency
 void fcd_set_freq(int f) {
     pthread_mutex_lock(&fcd_mutex);
     freq_hz = f;
+    if (last_freq != freq_hz) {
+        last_freq = freq_hz;
+        // Signal thread
+        pthread_cond_signal(&wait_con);
+    }
     pthread_mutex_unlock(&fcd_mutex);
 }
 
@@ -65,21 +75,18 @@ void fcdif_imp(void* data){
 
     // Loop until terminated
     while (td->terminate == FALSE) {
-        new_freq = fcd_get_freq();
-        //printf("%d,%d\n", new_freq,last_freq);
-        if (last_freq != new_freq) {
-            last_freq = new_freq;
+        // Wait on signal
+		pthread_cond_wait(&wait_con, &wait_mutex);
+        while (thrd_last_freq != fcd_get_freq()) {
             // Use the FCD controller software to set the frequency
+            new_freq = fcd_get_freq();
             stat = fcdAppSetFreq(new_freq);
-            //printf("Sent freq: %d\n", new_freq);
             if (stat == FCD_MODE_NONE)
                 printf("No FCD Detected!\n");
             else if (stat == FCD_MODE_BL)
                 printf("FCD in bootloader mode!\n");
-        } else {
-            sleep(0.1);
+            thrd_last_freq = new_freq;
         }
     }
-
     printf("FCD Interface thread exiting...\n");
 }
