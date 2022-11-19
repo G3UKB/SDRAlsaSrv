@@ -104,7 +104,7 @@ static int alsa_init() {
 
     // Open audio device for capture
     // ToDo - pass in device name
-    rc = snd_pcm_open(&handle, "hw:1,0", SND_PCM_STREAM_CAPTURE, 0);
+    rc = snd_pcm_open(&handle, "hw:2,0", SND_PCM_STREAM_CAPTURE, 0);
     if (rc < 0) {
         fprintf(stderr, "Unable to open FCD device: %s\n", snd_strerror(rc));
         return rc;
