@@ -47,7 +47,7 @@ void udp_reader_imp(void* data){
 
     while (td->terminate == FALSE) {
          udprecvdata(sd, cli_addr);
-         //sleep(0.1);
+         sleep(0.01);
     }
 
     printf("UDP Reader thread exiting...\n");
@@ -62,6 +62,7 @@ static void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
     unsigned int freq = 0;
     int n;
     unsigned int addr_sz = sizeof(*cliAddr);
+    int offset = 0;
 
     // Read a frame size data packet
     memset(pcdata, 0, METIS_FRAME_SZ);
@@ -70,20 +71,24 @@ static void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
     if (udp_reader_state == STATE_DATA) {
         if(n == METIS_FRAME_SZ) {
             // Extract the control bytes
-            //if (pcdata[11] == 0x02)
-                printf("%d\n", pcdata[11]);
-            if ((pcdata[11] & 0xFE) == 0x02) {
+            int go = TRUE;
+            if ((pcdata[11] & 0xFE) == 0x02)
+                offset = 12;
+            else if ((pcdata[512 + 11] & 0xFE) == 0x02)
+                offset = 512 + 12;
+            else
+                go = FALSE;
+            if (go) {
                 // Extract freq LSB in bo
-                b3 = pcdata[12];
-                b2 = pcdata[13];
-                b1 = pcdata[14];
-                b0 = pcdata[15];
+                b3 = pcdata[offset];
+                b2 = pcdata[offset + 1];
+                b1 = pcdata[offset + 2];
+                b0 = pcdata[offset + 3];
                 // Format into an unsigned int as a frequency in Hz
                 freq = (int)(b3 << 24);
                 freq = (int)(freq | (b2 << 16));
                 freq = (int)(freq | (b1 << 8));
                 freq = (int)(freq | b0);
-                printf("Got freq: %d\n", freq);
                 fcd_set_freq(freq);
             }
         } else if (n>0) {
