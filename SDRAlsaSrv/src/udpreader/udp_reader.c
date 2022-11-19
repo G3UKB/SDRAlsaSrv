@@ -66,10 +66,11 @@ static void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
     // Read a frame size data packet
     memset(pcdata, 0, METIS_FRAME_SZ);
     n = recvfrom(sd, pcdata, METIS_FRAME_SZ, 0, (struct sockaddr_in *)cliAddr, &addr_sz);
-    printf("Got %d", n);
+    //printf("Got %d", n);
     if (udp_reader_state == STATE_DATA) {
         if(n == METIS_FRAME_SZ) {
             // Extract the control bytes
+            printf("Got 11 %d", pcdata[11]);
             if ((pcdata[11] & 0xFE) == 0x02) {
                 // Extract freq LSB in bo
                 b3 = pcdata[12];
