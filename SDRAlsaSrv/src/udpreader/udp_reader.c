@@ -70,8 +70,8 @@ static void udprecvdata(int sd, struct sockaddr_in *cliAddr) {
     if (udp_reader_state == STATE_DATA) {
         if(n == METIS_FRAME_SZ) {
             // Extract the control bytes
-            if (pcdata[11] == 0x02)
-                printf("Got 0x02");
+            //if (pcdata[11] == 0x02)
+                printf("%d\n", pcdata[11]);
             if ((pcdata[11] & 0xFE) == 0x02) {
                 // Extract freq LSB in bo
                 b3 = pcdata[12];
